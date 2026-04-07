@@ -27,9 +27,14 @@ const pad = {
     el.pause()
     el.src = keyToFile(key)
     el.currentTime = 0
-    el.play()
-      .then(() => { this.ownerId = id; this.notify() })
-      .catch(err => console.warn('Pad play failed:', err))
+    el.load()
+    const tryPlay = () => {
+      el.play()
+        .then(() => { this.ownerId = id; this.notify() })
+        .catch(err => console.warn('Pad play failed:', err))
+    }
+    // Wait for canplay event before playing
+    el.addEventListener('canplay', tryPlay, { once: true })
   },
 
   stop() {
@@ -42,9 +47,11 @@ const pad = {
 
   swapKey(key) {
     const el = this.get()
+    el.pause()
     el.src = keyToFile(key)
     el.currentTime = 0
-    el.play().catch(console.warn)
+    el.load()
+    el.addEventListener('canplay', () => el.play().catch(console.warn), { once: true })
   },
 
   notify() {

@@ -9,7 +9,7 @@ export default function Header({ total, search, onSearch, filterKey, onFilterKey
       <div className="hdr-top">
         <div className="logo">
           <span className="logo-icon">🎸</span>
-          Cifras Gospel
+          CIFREI
         </div>
         <div className="hdr-right">
           <span className="badge-count">{total} músicas</span>

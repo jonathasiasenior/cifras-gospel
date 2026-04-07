@@ -29,7 +29,7 @@ export default function LoginPage() {
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <div style={{ fontSize: '48px', marginBottom: '8px' }}>🎸</div>
           <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#1a1a2e', marginBottom: '4px' }}>
-            Cifras Gospel
+            CIFREI
           </h1>
           <p style={{ fontSize: '13px', color: '#999' }}>Entre com sua conta para acessar</p>
         </div>
