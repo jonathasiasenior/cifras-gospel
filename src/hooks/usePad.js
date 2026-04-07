@@ -1,70 +1,91 @@
-import { useRef, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
-// Map key name → audio file
-const FLAT_TO_SHARP = { 'Db':'Cs','Eb':'Ds','Fb':'E','Gb':'Fs','Ab':'Gs','Bb':'As','Cb':'B' }
+const FLAT_TO_SHARP = { Db:'Cs', Eb:'Ds', Fb:'E', Gb:'Fs', Ab:'Gs', Bb:'As', Cb:'B' }
 
 function keyToFile(key) {
-  // Strip minor suffix, normalize flats to sharps
   const root = key.endsWith('m') ? key.slice(0, -1) : key
-  const normalized = FLAT_TO_SHARP[root] || root
-  return `/audio/pad-${normalized}.wav`
+  return `/audio/pad-${FLAT_TO_SHARP[root] || root}.wav`
 }
 
+// ── Global singleton (survives React StrictMode remounts) ──────────────────
+const pad = {
+  el: null,
+  ownerId: null,         // which card is currently playing
+  listeners: new Set(),  // callbacks to notify on state change
+
+  get() {
+    if (!this.el) {
+      this.el = new Audio()
+      this.el.loop = true
+      this.el.volume = 0.75
+    }
+    return this.el
+  },
+
+  play(id, key) {
+    const el = this.get()
+    el.pause()
+    el.src = keyToFile(key)
+    el.currentTime = 0
+    el.play()
+      .then(() => { this.ownerId = id; this.notify() })
+      .catch(err => console.warn('Pad play failed:', err))
+  },
+
+  stop() {
+    const el = this.get()
+    el.pause()
+    el.currentTime = 0
+    this.ownerId = null
+    this.notify()
+  },
+
+  swapKey(key) {
+    const el = this.get()
+    el.src = keyToFile(key)
+    el.currentTime = 0
+    el.play().catch(console.warn)
+  },
+
+  notify() {
+    this.listeners.forEach(fn => fn())
+  },
+
+  subscribe(fn) {
+    this.listeners.add(fn)
+    return () => this.listeners.delete(fn)
+  }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+let nextId = 0
+
 export function usePad(currentKey) {
+  const [id] = useState(() => ++nextId)
   const [playing, setPlaying] = useState(false)
-  const audioRef = useRef(null)
-  const currentKeyRef = useRef(currentKey)
 
+  // Subscribe to global pad state changes
   useEffect(() => {
-    currentKeyRef.current = currentKey
-    // If playing, switch to new key audio seamlessly
-    if (playing && audioRef.current) {
-      const newSrc = keyToFile(currentKey)
-      if (!audioRef.current.src.endsWith(newSrc)) {
-        const currentTime = audioRef.current.currentTime
-        audioRef.current.src = newSrc
-        audioRef.current.loop = true
-        audioRef.current.play().catch(() => {})
-      }
-    }
-  }, [currentKey, playing])
+    const unsub = pad.subscribe(() => {
+      setPlaying(pad.ownerId === id)
+    })
+    return unsub
+  }, [id])
 
+  // If this pad is active and key changes → swap audio immediately
   useEffect(() => {
-    return () => {
-      // Cleanup on unmount
-      if (audioRef.current) {
-        audioRef.current.pause()
-        audioRef.current = null
-      }
+    if (pad.ownerId === id) {
+      pad.swapKey(currentKey)
     }
-  }, [])
+  }, [currentKey, id])
 
   function toggle() {
-    if (playing) {
-      if (audioRef.current) {
-        audioRef.current.pause()
-        audioRef.current.currentTime = 0
-      }
-      setPlaying(false)
+    if (pad.ownerId === id) {
+      pad.stop()
     } else {
-      if (!audioRef.current) {
-        audioRef.current = new Audio()
-      }
-      audioRef.current.src = keyToFile(currentKeyRef.current)
-      audioRef.current.loop = true
-      audioRef.current.volume = 0.7
-      audioRef.current.play().catch(() => setPlaying(false))
-      setPlaying(true)
+      pad.play(id, currentKey)
     }
   }
 
-  function stop() {
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current.currentTime = 0
-    }
-    setPlaying(false)
-  }
-
-  return { playing, toggle, stop }
+  return { playing, toggle }
 }
