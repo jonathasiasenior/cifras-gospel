@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { transposeRoot, transposeKey, transposeCifraText, expandLabel, expandSections } from '../hooks/useChords'
+import { usePad } from '../hooks/usePad'
 
 function chordSize(chord) {
   if (chord.length <= 3) return ''
@@ -36,6 +37,7 @@ export default function SongCard({ song, songIdx, fontScale, onAddToPlaylist }) 
 
   const currentKey = transposeKey(song.key || 'C', transpose)
   const sections = expandSections(song.sections || [])
+  const { playing: padPlaying, toggle: togglePad } = usePad(currentKey)
 
   useEffect(() => {
     if (scrolling) {
@@ -67,6 +69,22 @@ export default function SongCard({ song, songIdx, fontScale, onAddToPlaylist }) 
             <span className="key-badge">{currentKey}</span>
             <button className="btn-t" onClick={() => doTranspose(1)}>+</button>
           </div>
+          <button
+            onClick={togglePad}
+            title={padPlaying ? 'Parar pad' : `Tocar pad (${currentKey})`}
+            style={{
+              background: padPlaying ? '#1a1a2e' : '#F0EEE8',
+              border: 'none', borderRadius: '8px',
+              padding: '0 10px', height: '30px',
+              fontSize: '12px', fontWeight: '800',
+              cursor: 'pointer', color: padPlaying ? '#f0c040' : '#666',
+              display: 'flex', alignItems: 'center', gap: '4px',
+              transition: 'all .2s', whiteSpace: 'nowrap',
+              boxShadow: padPlaying ? '0 0 0 2px #f0c040' : 'none'
+            }}
+          >
+            {padPlaying ? '⏸' : '▶'} PAD
+          </button>
           <button className="btn-icon btn-pl-add" onClick={() => onAddToPlaylist(songIdx)} title="Adicionar à playlist">+</button>
         </div>
       </div>
