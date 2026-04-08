@@ -52,6 +52,7 @@ export function useAuthProvider() {
 
   async function signOut() {
     await supabase.auth.signOut()
+    window.location.reload()
   }
 
   const isAdmin = profile?.role === 'admin'
