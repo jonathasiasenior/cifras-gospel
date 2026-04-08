@@ -56,7 +56,7 @@ export function useAuthProvider() {
   }
 
   const isAdmin = profile?.role === 'admin'
-  const isApproved = isAdmin || profile?.approved === true
+  const isApproved = !!user   // any logged-in user has full access
   const mustChangePassword = profile?.must_change_password === true
 
   return { user, profile, loading, isAdmin, isApproved, mustChangePassword, signIn, signOut }

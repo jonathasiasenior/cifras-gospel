@@ -2,7 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { AuthContext, useAuthProvider } from './hooks/useAuth'
 import App from './App'
-import LoginPage from './components/LoginPage'
 import ChangePasswordPage from './components/ChangePasswordPage'
 import './index.css'
 
@@ -28,18 +27,16 @@ function Root() {
     return (
       <div className="loading">
         <div className="spinner" />
-        Verificando acesso…
+        Carregando…
       </div>
     )
   }
 
   return (
     <AuthContext.Provider value={auth}>
-      {!auth.user
-        ? <LoginPage />
-        : auth.mustChangePassword
-          ? <ChangePasswordPage onDone={() => window.location.reload()} />
-          : <App />
+      {auth.mustChangePassword
+        ? <ChangePasswordPage onDone={() => window.location.reload()} />
+        : <App />
       }
     </AuthContext.Provider>
   )

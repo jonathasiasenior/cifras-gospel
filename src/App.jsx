@@ -8,6 +8,7 @@ import AdminPage from './components/AdminPage'
 import AccessBlockedModal from './components/AccessBlockedModal'
 import RequestModal from './components/RequestModal'
 import DemoBanner from './components/DemoBanner'
+import LoginModal from './components/LoginModal'
 import { groupByKey, normalizeStr } from './hooks/useChords'
 import { usePlaylists } from './hooks/usePlaylists'
 import { useAuth } from './hooks/useAuth'
@@ -34,6 +35,7 @@ export default function App() {
   const [toast, setToast] = useState('')
   const [showBlocked, setShowBlocked] = useState(false)
   const [requestType, setRequestType] = useState(null) // 'music'|'feedback'|'atendimento'
+  const [showLoginModal, setShowLoginModal] = useState(false)
   const toastTimer = useRef(null)
 
   const { playlists, create, rename, remove, toggleSong, moveSong, removeSong } = usePlaylists(user?.id)
@@ -146,6 +148,7 @@ export default function App() {
         onRequestMusic={() => setRequestType('music')}
         onFeedback={() => setRequestType('feedback')}
         onAtendimento={() => setRequestType('atendimento')}
+        onLogin={() => setShowLoginModal(true)}
       />
 
       {/* Demo banner for non-approved users */}
@@ -260,6 +263,9 @@ export default function App() {
 
       {/* Access blocked modal */}
       {showBlocked && <AccessBlockedModal onClose={() => setShowBlocked(false)} />}
+
+      {/* Login modal */}
+      {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
 
       {/* Request modals */}
       {requestType && <RequestModal type={requestType} onClose={() => setRequestType(null)} />}

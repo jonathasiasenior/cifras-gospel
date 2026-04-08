@@ -2,8 +2,8 @@ import React from 'react'
 import { useAuth } from '../hooks/useAuth'
 
 export default function PlaylistPicker({ playlists, songIdx, onToggle, onCreate, onClose, onBlockedAction }) {
-  const { profile } = useAuth()
-  const isApproved = profile?.role === 'admin' || profile?.approved === true
+  const { user } = useAuth()
+  const isApproved = !!user
 
   function handleCreate() {
     if (!isApproved) { onClose(); onBlockedAction?.(); return }

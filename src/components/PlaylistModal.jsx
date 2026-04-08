@@ -3,8 +3,8 @@ import { useAuth } from '../hooks/useAuth'
 
 export default function PlaylistModal({ playlists, songs, onClose, onCreate, onRename, onDelete, onView, onBlockedAction }) {
   const [newName, setNewName] = useState('')
-  const { profile } = useAuth()
-  const isApproved = profile?.role === 'admin' || profile?.approved === true
+  const { user } = useAuth()
+  const isApproved = !!user
 
   function handleCreate() {
     if (!isApproved) { onClose(); onBlockedAction?.(); return }
