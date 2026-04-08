@@ -44,7 +44,7 @@ export default function SongCard({ song, songIdx, fontScale, onAddToPlaylist, on
 
   const currentKey = transposeKey(song.key || 'C', transpose)
   const sections = expandSections(song.sections || [])
-  const { playing: padPlaying, toggle: togglePadRaw } = usePad(currentKey)
+  const { playing: padPlaying, toggle: togglePadRaw, padAvailable } = usePad(currentKey)
 
   // Load any existing edit for this song
   useEffect(() => {
@@ -122,22 +122,36 @@ export default function SongCard({ song, songIdx, fontScale, onAddToPlaylist, on
             <span className="key-badge">{currentKey}</span>
             <button className="btn-t" onClick={() => doTranspose(1)}>+</button>
           </div>
-          <button
-            onClick={togglePad}
-            title={padPlaying ? 'Parar pad' : `Tocar pad (${currentKey})`}
-            style={{
-              background: padPlaying ? '#1a1a2e' : '#F0EEE8',
-              border: 'none', borderRadius: '8px',
-              padding: '0 10px', height: '30px',
-              fontSize: '12px', fontWeight: '800',
-              cursor: 'pointer', color: padPlaying ? '#f0c040' : '#666',
-              display: 'flex', alignItems: 'center', gap: '4px',
-              transition: 'all .2s', whiteSpace: 'nowrap',
-              boxShadow: padPlaying ? '0 0 0 2px #f0c040' : 'none'
-            }}
-          >
-            {padPlaying ? '⏸' : '▶'} PAD
-          </button>
+          {padAvailable ? (
+            <button
+              onClick={togglePad}
+              title={padPlaying ? 'Parar pad' : `Tocar pad (${currentKey})`}
+              style={{
+                background: padPlaying ? '#1a1a2e' : '#F0EEE8',
+                border: 'none', borderRadius: '8px',
+                padding: '0 10px', height: '30px',
+                fontSize: '12px', fontWeight: '800',
+                cursor: 'pointer', color: padPlaying ? '#f0c040' : '#666',
+                display: 'flex', alignItems: 'center', gap: '4px',
+                transition: 'all .2s', whiteSpace: 'nowrap',
+                boxShadow: padPlaying ? '0 0 0 2px #f0c040' : 'none'
+              }}
+            >
+              {padPlaying ? '⏸' : '▶'} PAD
+            </button>
+          ) : (
+            <span
+              title={`Ainda não temos PAD para ${currentKey}`}
+              style={{
+                background: '#F0EEE8', border: 'none', borderRadius: '8px',
+                padding: '0 10px', height: '30px', fontSize: '11px',
+                color: '#CCC', display: 'flex', alignItems: 'center', gap: '4px',
+                whiteSpace: 'nowrap', cursor: 'default'
+              }}
+            >
+              🎵 PAD indisponível
+            </span>
+          )}
           <button className="btn-icon btn-pl-add" onClick={() => handleFeature(() => onAddToPlaylist(songIdx))} title="Adicionar à playlist">+</button>
         </div>
       </div>

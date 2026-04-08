@@ -13,7 +13,7 @@ import { usePlaylists } from './hooks/usePlaylists'
 import { useAuth } from './hooks/useAuth'
 import { supabase } from './supabase'
 
-const DEMO_INDICES = [227, 842, 882] // Que Ele Cresça | A Ele A Glória | Ruja o Leão
+const DEMO_INDICES = [227] // Que Ele Cresça
 
 const KEY_ORDER = [
   'C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A#','Bb','B',

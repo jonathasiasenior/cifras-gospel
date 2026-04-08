@@ -1,17 +1,23 @@
 import { useState, useEffect } from 'react'
 
-const FLAT_TO_SHARP = { Db:'Cs', Eb:'Ds', Fb:'E', Gb:'Fs', Ab:'Gs', Bb:'As', Cb:'B' }
+const FLAT_MAP  = { Db:'Cs', Eb:'Ds', Fb:'E',  Gb:'Fs', Ab:'Gs', Bb:'As', Cb:'B'  }
+const SHARP_MAP = { 'C#':'Cs','D#':'Ds','F#':'Fs','G#':'Gs','A#':'As' }
+const AVAILABLE = new Set(['C','Cs','D','Ds','E','F','Fs','G','Gs','A','As','B'])
 
-function keyToFile(key) {
+function getFileKey(key) {
   const root = key.endsWith('m') ? key.slice(0, -1) : key
-  return `/audio/pad-${FLAT_TO_SHARP[root] || root}.wav`
+  return FLAT_MAP[root] || SHARP_MAP[root] || root
 }
 
-// ── Global singleton (survives React StrictMode remounts) ──────────────────
+function keyToFile(key) {
+  return `/audio/pad-${getFileKey(key)}.wav`
+}
+
+// ── Global singleton ──────────────────────────────────────────────────────────
 const pad = {
   el: null,
-  ownerId: null,         // which card is currently playing
-  listeners: new Set(),  // callbacks to notify on state change
+  ownerId: null,
+  listeners: new Set(),
 
   get() {
     if (!this.el) {
@@ -33,7 +39,6 @@ const pad = {
         .then(() => { this.ownerId = id; this.notify() })
         .catch(err => console.warn('Pad play failed:', err))
     }
-    // Wait for canplay event before playing
     el.addEventListener('canplay', tryPlay, { once: true })
   },
 
@@ -43,15 +48,6 @@ const pad = {
     el.currentTime = 0
     this.ownerId = null
     this.notify()
-  },
-
-  swapKey(key) {
-    const el = this.get()
-    el.pause()
-    el.src = keyToFile(key)
-    el.currentTime = 0
-    el.load()
-    el.addEventListener('canplay', () => el.play().catch(console.warn), { once: true })
   },
 
   notify() {
@@ -71,6 +67,9 @@ export function usePad(currentKey) {
   const [id] = useState(() => ++nextId)
   const [playing, setPlaying] = useState(false)
 
+  const fileKey = getFileKey(currentKey)
+  const padAvailable = AVAILABLE.has(fileKey)
+
   // Subscribe to global pad state changes
   useEffect(() => {
     const unsub = pad.subscribe(() => {
@@ -79,12 +78,20 @@ export function usePad(currentKey) {
     return unsub
   }, [id])
 
-  // If this pad is active and key changes → swap audio immediately
+  // Stop PAD when key changes (don't auto-swap — user must restart manually)
   useEffect(() => {
     if (pad.ownerId === id) {
-      pad.swapKey(currentKey)
+      pad.stop()
     }
-  }, [currentKey, id])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentKey])
+
+  // Stop PAD when component unmounts (song closed / navigation)
+  useEffect(() => {
+    return () => {
+      if (pad.ownerId === id) pad.stop()
+    }
+  }, [id])
 
   function toggle() {
     if (pad.ownerId === id) {
@@ -94,5 +101,5 @@ export function usePad(currentKey) {
     }
   }
 
-  return { playing, toggle }
+  return { playing, toggle, padAvailable }
 }

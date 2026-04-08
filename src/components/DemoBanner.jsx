@@ -7,10 +7,10 @@ export default function DemoBanner() {
     <div className="demo-banner">
       <div className="demo-banner-top">
         <span className="demo-badge">🔒 MODO DEMONSTRAÇÃO</span>
-        <span className="demo-count">3 de 970 músicas</span>
+        <span className="demo-count">1 de 970 músicas</span>
       </div>
       <p className="demo-headline">
-        Você está ouvindo <strong>3 músicas gratuitas</strong>.<br />
+        Você está ouvindo <strong>1 música de demonstração</strong>.<br />
         Desbloqueie tudo com acesso vitalício.
       </p>
       <div className="demo-features">
