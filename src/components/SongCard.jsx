@@ -27,9 +27,9 @@ function renderTraditional(text, st, flat) {
   }).join('')
 }
 
-export default function SongCard({ song, songIdx, fontScale, onAddToPlaylist, onBlockedAction }) {
+export default function SongCard({ song, songIdx, fontScale, onAddToPlaylist, onBlockedAction, isDemoSong }) {
   const { user, profile } = useAuth()
-  const isApproved = profile?.approved === true
+  const isApproved = isDemoSong || profile?.role === 'admin' || profile?.approved === true
 
   const [transpose, setTranspose] = useState(0)
   const [view, setView] = useState('traditional') // traditional | compact

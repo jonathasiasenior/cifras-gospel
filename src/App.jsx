@@ -7,10 +7,13 @@ import PlaylistView from './components/PlaylistView'
 import AdminPage from './components/AdminPage'
 import AccessBlockedModal from './components/AccessBlockedModal'
 import RequestModal from './components/RequestModal'
+import DemoBanner from './components/DemoBanner'
 import { groupByKey, normalizeStr } from './hooks/useChords'
 import { usePlaylists } from './hooks/usePlaylists'
 import { useAuth } from './hooks/useAuth'
 import { supabase } from './supabase'
+
+const DEMO_INDICES = [227, 842, 882] // Que Ele Cresça | A Ele A Glória | Ruja o Leão
 
 const KEY_ORDER = [
   'C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A#','Bb','B',
@@ -18,7 +21,7 @@ const KEY_ORDER = [
 ]
 
 export default function App() {
-  const { user, profile, isAdmin, signOut } = useAuth()
+  const { user, profile, isAdmin, isApproved, signOut } = useAuth()
   const [songs, setSongs] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -90,15 +93,18 @@ export default function App() {
 
   const activePl = playlists.find(p => p.id === activePlId)
 
-  // Search
+  // Search (non-approved users can only find demo songs)
   const searchResults = useMemo(() => {
     const q = normalizeStr(search.trim())
     if (!q) return null
     return songs
       .map((s, i) => ({ ...s, _idx: i }))
-      .filter(s => normalizeStr(s.title).includes(q) || normalizeStr(s.artist).includes(q))
+      .filter(s => {
+        if (!isApproved && !DEMO_INDICES.includes(s._idx)) return false
+        return normalizeStr(s.title).includes(q) || normalizeStr(s.artist).includes(q)
+      })
       .slice(0, 60)
-  }, [search, songs])
+  }, [search, songs, isApproved])
 
   // Grouped by key
   const grouped = useMemo(() => {
@@ -141,6 +147,9 @@ export default function App() {
         onAtendimento={() => setRequestType('atendimento')}
       />
 
+      {/* Demo banner for non-approved users */}
+      {!isApproved && !activePlId && <DemoBanner />}
+
       {/* Playlist view */}
       {activePlId && !search && (
         <PlaylistView
@@ -149,7 +158,7 @@ export default function App() {
           fontScale={fontScale}
           onBack={() => setActivePlId(null)}
           onAddToPlaylist={handleAddToPlaylist}
-                  onBlockedAction={() => setShowBlocked(true)}
+          onBlockedAction={() => setShowBlocked(true)}
           onMove={moveSong}
           onRemove={removeSong}
         />
@@ -171,6 +180,7 @@ export default function App() {
                   fontScale={fontScale}
                   onAddToPlaylist={handleAddToPlaylist}
                   onBlockedAction={() => setShowBlocked(true)}
+                  isDemoSong={!isApproved && DEMO_INDICES.includes(s._idx)}
                 />
               ))}
             </>
@@ -178,8 +188,25 @@ export default function App() {
         </div>
       )}
 
-      {/* Main list grouped by key */}
-      {!search && !activePlId && grouped.map(({ key, songs: keySongs }) => (
+      {/* Demo mode: show only 3 songs */}
+      {!isApproved && !search && !activePlId && (
+        <div style={{ padding: '0 0 16px' }}>
+          {DEMO_INDICES.map(idx => (
+            <SongCard
+              key={idx}
+              song={songs[idx]}
+              songIdx={idx}
+              fontScale={fontScale}
+              onAddToPlaylist={handleAddToPlaylist}
+              onBlockedAction={() => setShowBlocked(true)}
+              isDemoSong={true}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Main list grouped by key — approved users only */}
+      {isApproved && !search && !activePlId && grouped.map(({ key, songs: keySongs }) => (
         <div className="key-section" key={key} id={`key-${key}`}>
           <div className="key-header">
             <span className="kh-note">🎵 {key}</span>
@@ -194,7 +221,7 @@ export default function App() {
                 songIdx={idx}
                 fontScale={fontScale}
                 onAddToPlaylist={handleAddToPlaylist}
-                  onBlockedAction={() => setShowBlocked(true)}
+                onBlockedAction={() => setShowBlocked(true)}
               />
             )
           })}
