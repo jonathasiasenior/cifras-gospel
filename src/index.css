@@ -69,8 +69,38 @@ body{background:#F5F4F0;color:#1A1A1A;font-family:system-ui,-apple-system,sans-s
 /* ── Full cifra (traditional) ── */
 .song-full{padding:12px 14px 16px}
 .full-pre{font-family:'Courier New',monospace;font-size:calc(14px * var(--font-scale));line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#333;background:#F8F7F4;padding:12px;border-radius:10px}
-.trad-chord{color:#F5A623;font-weight:700}
-.trad-section{color:#999;font-weight:800;letter-spacing:1px}
+.trad-chord{color:#8B3A00;font-weight:900;text-shadow:0 0 1px rgba(139,58,0,.15)}
+.trad-section{color:#888;font-weight:800;letter-spacing:1px}
+
+/* Edit cifra button */
+.btn-edit-cifra{background:#F0EEE8;border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;color:#666;margin-left:auto;white-space:nowrap}
+.btn-edit-cifra:active{background:#e0ddd6}
+
+/* Access blocked overlay */
+.blocked-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:900;display:flex;align-items:center;justify-content:center;padding:20px}
+.blocked-modal{background:#fff;border-radius:20px;max-width:360px;width:100%;padding:28px 24px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.blocked-icon{font-size:48px;margin-bottom:12px}
+.blocked-title{font-size:20px;font-weight:900;color:#1a1a2e;margin-bottom:8px}
+.blocked-desc{font-size:14px;color:#666;line-height:1.5;margin-bottom:24px}
+.btn-wpp{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px;background:#25D366;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:10px;text-decoration:none}
+.btn-wpp:active{background:#1ebe5d}
+.btn-close-blocked{background:none;border:none;color:#AAA;font-size:14px;cursor:pointer;padding:4px}
+
+/* Change password page */
+.change-pw-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#F5F4F0}
+.change-pw-card{background:#fff;border-radius:20px;padding:32px 28px;max-width:380px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+.change-pw-title{font-size:20px;font-weight:900;color:#1a1a2e;margin-bottom:8px}
+.change-pw-sub{font-size:14px;color:#888;margin-bottom:24px;line-height:1.4}
+
+/* Menu drawer */
+.menu-drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:800;display:flex;align-items:flex-end;justify-content:center}
+.menu-drawer{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px;max-height:80vh;overflow-y:auto}
+.menu-drawer-title{font-size:16px;font-weight:800;color:#1a1a2e;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.menu-item-row{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#F8F7F4;border-radius:12px;margin-bottom:8px;cursor:pointer;border:none;width:100%;text-align:left}
+.menu-item-row:active{background:#F0EEE8}
+.menu-item-icon{font-size:22px}
+.menu-item-label{font-size:15px;font-weight:700;color:#1a1a2e}
+.menu-item-sub{font-size:11px;color:#999;margin-top:1px}
 
 /* ── Auto-scroll controls ── */
 .scroll-ctrl{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#F0EEE8;border-radius:10px;margin-bottom:10px;flex-wrap:wrap}

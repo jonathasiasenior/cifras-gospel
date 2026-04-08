@@ -1,56 +1,115 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 const KEYS = ['C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A#','Bb','B',
               'Cm','C#m','Dbm','Dm','D#m','Ebm','Em','Fm','F#m','Gbm','Gm','G#m','Abm','Am','A#m','Bbm','Bm']
 
-export default function Header({ total, search, onSearch, filterKey, onFilterKey, onFontChange, onPlaylistOpen, user, isAdmin, onAdmin, onSignOut }) {
+export default function Header({
+  total, search, onSearch, filterKey, onFilterKey, onFontChange,
+  onPlaylistOpen, user, isAdmin, onAdmin, onSignOut,
+  onRequestMusic, onFeedback, onAtendimento
+}) {
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  function menuAction(fn) {
+    setMenuOpen(false)
+    fn()
+  }
+
   return (
-    <div className="hdr">
-      <div className="hdr-top">
-        <div className="logo">
-          <span className="logo-icon">🎸</span>
-          CIFREI
-        </div>
-        <div className="hdr-right">
-          <span className="badge-count">{total} músicas</span>
-          <div className="font-ctrl-hdr">
-            <button className="font-btn-hdr" onClick={() => onFontChange(-0.1)}>A−</button>
-            <button className="font-btn-hdr" onClick={() => onFontChange(0.1)}>A+</button>
+    <>
+      <div className="hdr">
+        <div className="hdr-top">
+          <div className="logo">
+            <span className="logo-icon">🎸</span>
+            CIFREI
           </div>
-          <button className="btn-pl-hdr" onClick={onPlaylistOpen}>♫ Playlists</button>
-          {isAdmin && (
-            <button className="btn-pl-hdr" onClick={onAdmin} style={{ color: '#f0c040' }}>⚙️</button>
-          )}
-          <button
-            onClick={onSignOut}
-            title={`Sair (${user?.email || ''})`}
-            style={{ background: 'rgba(255,255,255,.08)', border: 'none', color: 'rgba(255,255,255,.6)', fontSize: '18px', cursor: 'pointer', borderRadius: '8px', padding: '5px 8px', lineHeight: 1 }}
-          >
-            ⏏
-          </button>
+          <div className="hdr-right">
+            <span className="badge-count">{total} músicas</span>
+            <div className="font-ctrl-hdr">
+              <button className="font-btn-hdr" onClick={() => onFontChange(-0.1)}>A−</button>
+              <button className="font-btn-hdr" onClick={() => onFontChange(0.1)}>A+</button>
+            </div>
+            <button className="btn-pl-hdr" onClick={onPlaylistOpen}>♫ Playlists</button>
+            {isAdmin && (
+              <button className="btn-pl-hdr" onClick={onAdmin} style={{ color: '#f0c040' }}>⚙️</button>
+            )}
+            <button
+              onClick={() => setMenuOpen(true)}
+              style={{ background: 'rgba(255,255,255,.1)', border: 'none', color: '#fff', fontSize: '18px', cursor: 'pointer', borderRadius: '8px', padding: '5px 9px', lineHeight: 1 }}
+              title="Menu"
+            >
+              ☰
+            </button>
+          </div>
+        </div>
+        <div className="hdr-bar">
+          <div className="search-box">
+            <span className="s-icon">🔍</span>
+            <input
+              type="text"
+              placeholder="Buscar música ou artista…"
+              value={search}
+              onChange={e => onSearch(e.target.value)}
+            />
+            {search && (
+              <button className="s-clear" onClick={() => onSearch('')}>✕</button>
+            )}
+          </div>
+          <div className="key-sel">
+            <select value={filterKey} onChange={e => onFilterKey(e.target.value)}>
+              <option value="">Tom</option>
+              {KEYS.map(k => <option key={k} value={k}>{k}</option>)}
+            </select>
+            <span className="key-arr">▾</span>
+          </div>
         </div>
       </div>
-      <div className="hdr-bar">
-        <div className="search-box">
-          <span className="s-icon">🔍</span>
-          <input
-            type="text"
-            placeholder="Buscar música ou artista…"
-            value={search}
-            onChange={e => onSearch(e.target.value)}
-          />
-          {search && (
-            <button className="s-clear" onClick={() => onSearch('')}>✕</button>
-          )}
+
+      {/* Menu drawer */}
+      {menuOpen && (
+        <div className="menu-drawer-overlay" onClick={() => setMenuOpen(false)}>
+          <div className="menu-drawer" onClick={e => e.stopPropagation()}>
+            <div className="menu-drawer-title">🎸 Menu</div>
+
+            <button className="menu-item-row" onClick={() => menuAction(onRequestMusic)}>
+              <span className="menu-item-icon">🎵</span>
+              <div>
+                <div className="menu-item-label">Pedir Nova Música</div>
+                <div className="menu-item-sub">Solicite uma cifra que não encontrou</div>
+              </div>
+            </button>
+
+            <button className="menu-item-row" onClick={() => menuAction(onFeedback)}>
+              <span className="menu-item-icon">💬</span>
+              <div>
+                <div className="menu-item-label">Feedback</div>
+                <div className="menu-item-sub">Nos diga o que achou do CIFREI</div>
+              </div>
+            </button>
+
+            <button className="menu-item-row" onClick={() => menuAction(onAtendimento)}>
+              <span className="menu-item-icon">🎧</span>
+              <div>
+                <div className="menu-item-label">Atendimento</div>
+                <div className="menu-item-sub">Precisa de ajuda? Fale conosco</div>
+              </div>
+            </button>
+
+            <div style={{ borderTop: '1px solid #F0EEE8', margin: '8px 0' }} />
+
+            <button
+              className="menu-item-row"
+              onClick={() => { setMenuOpen(false); onSignOut() }}
+            >
+              <span className="menu-item-icon">⏏️</span>
+              <div>
+                <div className="menu-item-label">Sair</div>
+                <div className="menu-item-sub">{user?.email || ''}</div>
+              </div>
+            </button>
+          </div>
         </div>
-        <div className="key-sel">
-          <select value={filterKey} onChange={e => onFilterKey(e.target.value)}>
-            <option value="">Tom</option>
-            {KEYS.map(k => <option key={k} value={k}>{k}</option>)}
-          </select>
-          <span className="key-arr">▾</span>
-        </div>
-      </div>
-    </div>
+      )}
+    </>
   )
 }

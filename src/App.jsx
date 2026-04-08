@@ -5,7 +5,9 @@ import PlaylistModal from './components/PlaylistModal'
 import PlaylistPicker from './components/PlaylistPicker'
 import PlaylistView from './components/PlaylistView'
 import AdminPage from './components/AdminPage'
-import { groupByKey, keyIndex, normalizeStr } from './hooks/useChords'
+import AccessBlockedModal from './components/AccessBlockedModal'
+import RequestModal from './components/RequestModal'
+import { groupByKey, normalizeStr } from './hooks/useChords'
 import { usePlaylists } from './hooks/usePlaylists'
 import { useAuth } from './hooks/useAuth'
 import { supabase } from './supabase'
@@ -27,6 +29,8 @@ export default function App() {
   const [pickerSongIdx, setPickerSongIdx] = useState(null)
   const [activePlId, setActivePlId] = useState(null)
   const [toast, setToast] = useState('')
+  const [showBlocked, setShowBlocked] = useState(false)
+  const [requestType, setRequestType] = useState(null) // 'music'|'feedback'|'atendimento'
   const toastTimer = useRef(null)
 
   const { playlists, create, rename, remove, toggleSong, moveSong, removeSong } = usePlaylists(user?.id)
@@ -132,6 +136,9 @@ export default function App() {
         isAdmin={isAdmin}
         onAdmin={() => setShowAdmin(true)}
         onSignOut={signOut}
+        onRequestMusic={() => setRequestType('music')}
+        onFeedback={() => setRequestType('feedback')}
+        onAtendimento={() => setRequestType('atendimento')}
       />
 
       {/* Playlist view */}
@@ -142,6 +149,7 @@ export default function App() {
           fontScale={fontScale}
           onBack={() => setActivePlId(null)}
           onAddToPlaylist={handleAddToPlaylist}
+                  onBlockedAction={() => setShowBlocked(true)}
           onMove={moveSong}
           onRemove={removeSong}
         />
@@ -162,6 +170,7 @@ export default function App() {
                   songIdx={s._idx}
                   fontScale={fontScale}
                   onAddToPlaylist={handleAddToPlaylist}
+                  onBlockedAction={() => setShowBlocked(true)}
                 />
               ))}
             </>
@@ -185,6 +194,7 @@ export default function App() {
                 songIdx={idx}
                 fontScale={fontScale}
                 onAddToPlaylist={handleAddToPlaylist}
+                  onBlockedAction={() => setShowBlocked(true)}
               />
             )
           })}
@@ -217,6 +227,12 @@ export default function App() {
 
       {/* Admin panel */}
       {showAdmin && isAdmin && <AdminPage onClose={() => setShowAdmin(false)} />}
+
+      {/* Access blocked modal */}
+      {showBlocked && <AccessBlockedModal onClose={() => setShowBlocked(false)} />}
+
+      {/* Request modals */}
+      {requestType && <RequestModal type={requestType} onClose={() => setRequestType(null)} />}
 
       {/* Toast */}
       <div className={`toast${toast ? ' show' : ''}`}>{toast}</div>

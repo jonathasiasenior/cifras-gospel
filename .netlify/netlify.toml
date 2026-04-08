@@ -10,7 +10,6 @@ redirects = []
 publish = "C:\\Users\\Jonathas\\Desktop\\criaçõesIA\\OpenSquad\\opensquad\\squads\\cifra-simplifier\\output\\react-app\\dist"
 publishOrigin = "ui"
 commandOrigin = "ui"
-base = "C:\\Users\\Jonathas\\Desktop\\criaçõesIA\\OpenSquad\\opensquad\\squads\\cifra-simplifier\\output\\react-app"
 command = "npm run build"
 
 [build.environment]
