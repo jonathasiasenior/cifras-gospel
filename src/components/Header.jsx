@@ -37,6 +37,18 @@ export default function Header({
             {isAdmin && (
               <button className="btn-pl-hdr" onClick={onAdmin} style={{ color: '#f0c040' }}>⚙️</button>
             )}
+            {!isApproved && (
+              <button
+                onClick={onLogin}
+                style={{
+                  background: '#f0c040', border: 'none', color: '#1a1a2e',
+                  fontSize: '12px', fontWeight: '800', cursor: 'pointer',
+                  borderRadius: '20px', padding: '7px 14px', whiteSpace: 'nowrap'
+                }}
+              >
+                🔑 Entrar
+              </button>
+            )}
             <button
               onClick={() => setMenuOpen(true)}
               style={{ background: 'rgba(255,255,255,.1)', border: 'none', color: '#fff', fontSize: '18px', cursor: 'pointer', borderRadius: '8px', padding: '5px 9px', lineHeight: 1 }}

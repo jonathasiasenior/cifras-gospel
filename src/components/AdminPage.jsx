@@ -70,13 +70,21 @@ export default function AdminPage({ onClose }) {
       })
       const data = await res.json()
       if (data.id) {
-        // Update profile with phone, name, mark must_change_password
-        await supabase.from('profiles').update({
-          display_name: form.name || form.email.split('@')[0],
-          phone: form.phone,
-          must_change_password: true,
-          approved: false
-        }).eq('id', data.id)
+        // Use service role to update profile (bypasses RLS)
+        await fetch(`${PROJECT_URL}/rest/v1/profiles?id=eq.${data.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${SERVICE_ROLE}`,
+            'apikey': SERVICE_ROLE,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            display_name: form.name || form.email.split('@')[0],
+            phone: form.phone,
+            must_change_password: true
+          })
+        })
         setMsg(`✓ Usuário ${form.email} criado!`)
         setForm({ name: '', email: '', phone: '', password: '' })
         setTimeout(loadUsers, 800)
@@ -90,7 +98,11 @@ export default function AdminPage({ onClose }) {
   }
 
   async function toggleApprove(userId, current) {
-    await supabase.from('profiles').update({ approved: !current }).eq('id', userId)
+    await fetch(`${PROJECT_URL}/rest/v1/profiles?id=eq.${userId}`, {
+      method: 'PATCH',
+      headers: { 'Authorization': `Bearer ${SERVICE_ROLE}`, 'apikey': SERVICE_ROLE, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ approved: !current })
+    })
     setUsers(u => u.map(p => p.id === userId ? { ...p, approved: !current } : p))
   }
 
@@ -107,7 +119,11 @@ export default function AdminPage({ onClose }) {
         },
         body: JSON.stringify({ password: resetPw })
       })
-      await supabase.from('profiles').update({ must_change_password: true }).eq('id', userId)
+      await fetch(`${PROJECT_URL}/rest/v1/profiles?id=eq.${userId}`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${SERVICE_ROLE}`, 'apikey': SERVICE_ROLE, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ must_change_password: true })
+      })
       setResetId(null)
       setResetPw('')
       setMsg('✓ Senha resetada. Usuário deverá trocar no próximo acesso.')
@@ -119,7 +135,10 @@ export default function AdminPage({ onClose }) {
 
   async function removeUser(userId, email) {
     if (!confirm(`Remover acesso de ${email}?`)) return
-    await supabase.from('profiles').delete().eq('id', userId)
+    await fetch(`${PROJECT_URL}/rest/v1/profiles?id=eq.${userId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${SERVICE_ROLE}`, 'apikey': SERVICE_ROLE }
+    })
     setUsers(u => u.filter(p => p.id !== userId))
   }
 
