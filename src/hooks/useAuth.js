@@ -24,14 +24,19 @@ export function useAuthProvider() {
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null)
-      if (session?.user) await fetchProfile(session.user.id)
+      if (session?.user) {
+        try { await fetchProfile(session.user.id) } catch { /* ignore */ }
+      }
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null)
-      if (session?.user) await fetchProfile(session.user.id)
-      else setProfile(null)
+      if (session?.user) {
+        try { await fetchProfile(session.user.id) } catch { /* ignore */ }
+      } else {
+        setProfile(null)
+      }
     })
     return () => subscription.unsubscribe()
   }, [])
