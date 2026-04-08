@@ -50,8 +50,11 @@ export function useAuthProvider() {
     return error
   }
 
-  async function signOut() {
-    await supabase.auth.signOut()
+  function signOut() {
+    // Clear Supabase session directly from localStorage (bypasses hanging network calls)
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('sb-'))
+      .forEach(k => localStorage.removeItem(k))
     window.location.reload()
   }
 

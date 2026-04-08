@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
-import { supabase } from '../supabase'
 import { useAuth } from '../hooks/useAuth'
 
+const SERVICE_ROLE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxcGtodXl2ZXl1cnJuY3JxZ3RrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTU4OTM2OCwiZXhwIjoyMDkxMTY1MzY4fQ._5jGk86vxBeUmpyC7VLdUI8aeSmaK9vkUfg8hWuFj-A'
+const PROJECT_URL = 'https://hqpkhuyveyurrncrqgtk.supabase.co'
+
 const TYPES = {
-  music: { label: 'Pedir Nova Música', icon: '🎵', placeholder: 'Qual música você quer? Informe nome e artista…' },
-  feedback: { label: 'Feedback', icon: '💬', placeholder: 'Deixe seu feedback sobre o CIFREI…' },
-  atendimento: { label: 'Atendimento', icon: '🎧', placeholder: 'Descreva como podemos te ajudar…' }
+  music:      { label: 'Pedir Nova Música', icon: '🎵', placeholder: 'Qual música você quer? Informe nome e artista…' },
+  feedback:   { label: 'Feedback',          icon: '💬', placeholder: 'Deixe seu feedback sobre o CIFREI…' },
+  atendimento:{ label: 'Atendimento',       icon: '🎧', placeholder: 'Descreva como podemos te ajudar…' }
 }
 
 export default function RequestModal({ type, onClose }) {
@@ -13,20 +15,41 @@ export default function RequestModal({ type, onClose }) {
   const [message, setMessage] = useState('')
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
+  const [error, setError] = useState('')
   const cfg = TYPES[type]
 
   async function handleSend(e) {
     e.preventDefault()
     if (!message.trim()) return
     setSending(true)
-    await supabase.from('requests').insert({
-      user_id: user?.id || null,
-      user_email: user?.email || profile?.email || '',
-      user_name: profile?.display_name || profile?.email || '',
-      type,
-      message: message.trim()
-    })
-    setSent(true)
+    setError('')
+    try {
+      const res = await fetch(`${PROJECT_URL}/rest/v1/requests`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${SERVICE_ROLE}`,
+          'apikey': SERVICE_ROLE,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          user_id: user?.id || null,
+          user_email: user?.email || '',
+          user_name: profile?.display_name || user?.email || '',
+          type,
+          message: message.trim()
+        })
+      })
+      if (res.ok || res.status === 201) {
+        setSent(true)
+      } else {
+        const text = await res.text()
+        setError('Erro ao enviar. Tente novamente.')
+        console.error('Request insert error:', text)
+      }
+    } catch (err) {
+      setError('Erro de conexão. Tente novamente.')
+    }
     setSending(false)
   }
 
@@ -61,6 +84,9 @@ export default function RequestModal({ type, onClose }) {
                 fontFamily: 'inherit', lineHeight: '1.5', marginBottom: '12px', background: '#F8F7F4'
               }}
             />
+            {error && (
+              <div style={{ color: '#c0392b', fontSize: '13px', marginBottom: '10px' }}>{error}</div>
+            )}
             <button type="submit" disabled={sending || !message.trim()} style={{
               width: '100%', padding: '13px', background: sending ? '#AAA' : '#1a1a2e',
               color: '#fff', border: 'none', borderRadius: '12px', fontSize: '14px',
