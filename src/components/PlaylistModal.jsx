@@ -1,9 +1,13 @@
 import React, { useState } from 'react'
+import { useAuth } from '../hooks/useAuth'
 
-export default function PlaylistModal({ playlists, songs, onClose, onCreate, onRename, onDelete, onView }) {
+export default function PlaylistModal({ playlists, songs, onClose, onCreate, onRename, onDelete, onView, onBlockedAction }) {
   const [newName, setNewName] = useState('')
+  const { profile } = useAuth()
+  const isApproved = profile?.role === 'admin' || profile?.approved === true
 
   function handleCreate() {
+    if (!isApproved) { onClose(); onBlockedAction?.(); return }
     const name = prompt('Nome da playlist:')
     if (name?.trim()) onCreate(name)
   }

@@ -145,7 +145,7 @@ export default function SongCard({ song, songIdx, fontScale, onAddToPlaylist, on
       {/* Tabs: Tradicional first, Compactada second */}
       <div className="view-toggle">
         <button className={`vtb${view === 'traditional' ? ' active' : ''}`} onClick={() => setView('traditional')}>Tradicional</button>
-        <button className={`vtb${view === 'compact' ? ' active' : ''}`} onClick={() => setView('compact')}>Compactada</button>
+        <button className={`vtb${view === 'compact' ? ' active' : ''}`} onClick={() => handleFeature(() => setView('compact'))}>Compactada</button>
       </div>
 
       {/* TRADICIONAL view */}

@@ -211,6 +211,7 @@ export default function App() {
           onRename={rename}
           onDelete={remove}
           onView={id => { setActivePlId(id); setSearch(''); setShowPlModal(false) }}
+          onBlockedAction={() => setShowBlocked(true)}
         />
       )}
 
@@ -222,6 +223,7 @@ export default function App() {
           onToggle={handlePickerToggle}
           onCreate={handlePickerCreate}
           onClose={() => setPickerSongIdx(null)}
+          onBlockedAction={() => setShowBlocked(true)}
         />
       )}
 
