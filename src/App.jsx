@@ -140,6 +140,7 @@ export default function App() {
         onPlaylistOpen={() => setShowPlModal(true)}
         user={profile}
         isAdmin={isAdmin}
+        isApproved={isApproved}
         onAdmin={() => setShowAdmin(true)}
         onSignOut={signOut}
         onRequestMusic={() => setRequestType('music')}

@@ -5,7 +5,7 @@ const KEYS = ['C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A
 
 export default function Header({
   total, search, onSearch, filterKey, onFilterKey, onFontChange,
-  onPlaylistOpen, user, isAdmin, onAdmin, onSignOut,
+  onPlaylistOpen, user, isAdmin, isApproved, onAdmin, onSignOut,
   onRequestMusic, onFeedback, onAtendimento
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -25,11 +25,15 @@ export default function Header({
           </div>
           <div className="hdr-right">
             <span className="badge-count">{total} músicas</span>
-            <div className="font-ctrl-hdr">
-              <button className="font-btn-hdr" onClick={() => onFontChange(-0.1)}>A−</button>
-              <button className="font-btn-hdr" onClick={() => onFontChange(0.1)}>A+</button>
-            </div>
-            <button className="btn-pl-hdr" onClick={onPlaylistOpen}>♫ Playlists</button>
+            {isApproved && (
+              <>
+                <div className="font-ctrl-hdr">
+                  <button className="font-btn-hdr" onClick={() => onFontChange(-0.1)}>A−</button>
+                  <button className="font-btn-hdr" onClick={() => onFontChange(0.1)}>A+</button>
+                </div>
+                <button className="btn-pl-hdr" onClick={onPlaylistOpen}>♫ Playlists</button>
+              </>
+            )}
             {isAdmin && (
               <button className="btn-pl-hdr" onClick={onAdmin} style={{ color: '#f0c040' }}>⚙️</button>
             )}
@@ -71,42 +75,75 @@ export default function Header({
           <div className="menu-drawer" onClick={e => e.stopPropagation()}>
             <div className="menu-drawer-title">🎸 Menu</div>
 
-            <button className="menu-item-row" onClick={() => menuAction(onRequestMusic)}>
-              <span className="menu-item-icon">🎵</span>
-              <div>
-                <div className="menu-item-label">Pedir Nova Música</div>
-                <div className="menu-item-sub">Solicite uma cifra que não encontrou</div>
-              </div>
-            </button>
+            {isApproved ? (
+              <>
+                <button className="menu-item-row" onClick={() => menuAction(onRequestMusic)}>
+                  <span className="menu-item-icon">🎵</span>
+                  <div>
+                    <div className="menu-item-label">Pedir Nova Música</div>
+                    <div className="menu-item-sub">Solicite uma cifra que não encontrou</div>
+                  </div>
+                </button>
 
-            <button className="menu-item-row" onClick={() => menuAction(onFeedback)}>
-              <span className="menu-item-icon">💬</span>
-              <div>
-                <div className="menu-item-label">Feedback</div>
-                <div className="menu-item-sub">Nos diga o que achou do CIFREI</div>
-              </div>
-            </button>
+                <button className="menu-item-row" onClick={() => menuAction(onFeedback)}>
+                  <span className="menu-item-icon">💬</span>
+                  <div>
+                    <div className="menu-item-label">Feedback</div>
+                    <div className="menu-item-sub">Nos diga o que achou do CIFREI</div>
+                  </div>
+                </button>
 
-            <button className="menu-item-row" onClick={() => menuAction(onAtendimento)}>
-              <span className="menu-item-icon">🎧</span>
-              <div>
-                <div className="menu-item-label">Atendimento</div>
-                <div className="menu-item-sub">Precisa de ajuda? Fale conosco</div>
-              </div>
-            </button>
+                <button className="menu-item-row" onClick={() => menuAction(onAtendimento)}>
+                  <span className="menu-item-icon">🎧</span>
+                  <div>
+                    <div className="menu-item-label">Atendimento</div>
+                    <div className="menu-item-sub">Precisa de ajuda? Fale conosco</div>
+                  </div>
+                </button>
 
-            <div style={{ borderTop: '1px solid #F0EEE8', margin: '8px 0' }} />
+                <div style={{ borderTop: '1px solid #F0EEE8', margin: '8px 0' }} />
 
-            <button
-              className="menu-item-row"
-              onClick={() => { setMenuOpen(false); onSignOut() }}
-            >
-              <span className="menu-item-icon">⏏️</span>
-              <div>
-                <div className="menu-item-label">Sair</div>
-                <div className="menu-item-sub">{user?.email || ''}</div>
-              </div>
-            </button>
+                <button className="menu-item-row" onClick={() => { setMenuOpen(false); onSignOut() }}>
+                  <span className="menu-item-icon">⏏️</span>
+                  <div>
+                    <div className="menu-item-label">Sair</div>
+                    <div className="menu-item-sub">{user?.email || ''}</div>
+                  </div>
+                </button>
+              </>
+            ) : (
+              <>
+                <div style={{ padding: '8px 4px 16px', color: '#888', fontSize: '13px', lineHeight: 1.5 }}>
+                  Você está no <strong>modo demonstração</strong>.<br />
+                  Para acesso completo, entre em contato.
+                </div>
+
+                <a
+                  className="menu-item-row"
+                  href={'https://wa.me/5511971345013?text=' + encodeURIComponent('Olá! Quero ter acesso completo ao CIFREI.')}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => setMenuOpen(false)}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  <span className="menu-item-icon">💬</span>
+                  <div>
+                    <div className="menu-item-label">Quero acesso completo</div>
+                    <div className="menu-item-sub">Fale conosco pelo WhatsApp</div>
+                  </div>
+                </a>
+
+                <div style={{ borderTop: '1px solid #F0EEE8', margin: '8px 0' }} />
+
+                <button className="menu-item-row" onClick={() => { setMenuOpen(false); onSignOut() }}>
+                  <span className="menu-item-icon">🔑</span>
+                  <div>
+                    <div className="menu-item-label">Entrar com minha conta</div>
+                    <div className="menu-item-sub">Já tem acesso? Faça login aqui</div>
+                  </div>
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
