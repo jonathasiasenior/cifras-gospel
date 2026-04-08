@@ -22,13 +22,17 @@ export function useAuthProvider() {
   }
 
   useEffect(() => {
+    // Failsafe: never stay on loading screen more than 6s
+    const failsafe = setTimeout(() => setLoading(false), 6000)
+
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      clearTimeout(failsafe)
       setUser(session?.user ?? null)
       if (session?.user) {
         try { await fetchProfile(session.user.id) } catch { /* ignore */ }
       }
       setLoading(false)
-    }).catch(() => setLoading(false))
+    }).catch(() => { clearTimeout(failsafe); setLoading(false) })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null)
