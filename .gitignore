@@ -30,3 +30,8 @@ npm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Audio files (large binaries — host externally)
+public/audio/*.wav
+public/audio/*.mp3
+public/audio/*.ogg
