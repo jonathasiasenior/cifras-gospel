@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { supabase } from '../supabase'
 
 const SERVICE_ROLE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxcGtodXl2ZXl1cnJuY3JxZ3RrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTU4OTM2OCwiZXhwIjoyMDkxMTY1MzY4fQ._5jGk86vxBeUmpyC7VLdUI8aeSmaK9vkUfg8hWuFj-A'
 const PROJECT_URL = 'https://hqpkhuyveyurrncrqgtk.supabase.co'
@@ -37,15 +36,23 @@ export default function AdminPage({ onClose }) {
 
   async function loadUsers() {
     setLoadingU(true)
-    const { data } = await supabase.from('profiles').select('*').order('created_at')
-    setUsers(data || [])
+    try {
+      const res = await fetch(`${PROJECT_URL}/rest/v1/profiles?select=*&order=created_at`, {
+        headers: { 'Authorization': `Bearer ${SERVICE_ROLE}`, 'apikey': SERVICE_ROLE }
+      })
+      setUsers(res.ok ? await res.json() : [])
+    } catch { setUsers([]) }
     setLoadingU(false)
   }
 
   async function loadRequests(type) {
     setLoadingR(true)
-    const { data } = await supabase.from('requests').select('*').eq('type', type).order('created_at', { ascending: false })
-    setRequests(data || [])
+    try {
+      const res = await fetch(`${PROJECT_URL}/rest/v1/requests?select=*&type=eq.${type}&order=created_at.desc`, {
+        headers: { 'Authorization': `Bearer ${SERVICE_ROLE}`, 'apikey': SERVICE_ROLE }
+      })
+      setRequests(res.ok ? await res.json() : [])
+    } catch { setRequests([]) }
     setLoadingR(false)
   }
 
@@ -143,7 +150,11 @@ export default function AdminPage({ onClose }) {
   }
 
   async function markRequestDone(id) {
-    await supabase.from('requests').update({ status: 'done' }).eq('id', id)
+    await fetch(`${PROJECT_URL}/rest/v1/requests?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { 'Authorization': `Bearer ${SERVICE_ROLE}`, 'apikey': SERVICE_ROLE, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ status: 'done' })
+    })
     setRequests(r => r.map(x => x.id === id ? { ...x, status: 'done' } : x))
   }
 
