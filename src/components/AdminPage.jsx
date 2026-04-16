@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
-const SERVICE_ROLE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxcGtodXl2ZXl1cnJuY3JxZ3RrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTU4OTM2OCwiZXhwIjoyMDkxMTY1MzY4fQ._5jGk86vxBeUmpyC7VLdUI8aeSmaK9vkUfg8hWuFj-A'
-const PROJECT_URL = 'https://hqpkhuyveyurrncrqgtk.supabase.co'
+const SERVICE_ROLE = import.meta.env.VITE_SUPABASE_SERVICE_ROLE
+const PROJECT_URL = import.meta.env.VITE_SUPABASE_URL
 
 const TAB_LABELS = [
   { key: 'users', label: '👥 Usuários' },

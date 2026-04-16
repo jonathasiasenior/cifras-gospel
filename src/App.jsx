@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import Header from './components/Header'
 import SongCard from './components/SongCard'
+import SongDetail from './components/SongDetail'
 import PlaylistModal from './components/PlaylistModal'
 import PlaylistPicker from './components/PlaylistPicker'
 import PlaylistView from './components/PlaylistView'
@@ -36,6 +37,7 @@ export default function App() {
   const [showBlocked, setShowBlocked] = useState(false)
   const [requestType, setRequestType] = useState(null) // 'music'|'feedback'|'atendimento'
   const [showLoginModal, setShowLoginModal] = useState(false)
+  const [openSong, setOpenSong] = useState(null) // { song, songIdx }
   const toastTimer = useRef(null)
 
   const { playlists, create, rename, remove, toggleSong, moveSong, removeSong } = usePlaylists(user?.id)
@@ -176,35 +178,30 @@ export default function App() {
           ) : (
             <>
               <div className="search-meta">{searchResults.length} resultado(s)</div>
-              {searchResults.map(s => (
-                <SongCard
-                  key={s._idx}
-                  song={s}
-                  songIdx={s._idx}
-                  fontScale={fontScale}
-                  onAddToPlaylist={handleAddToPlaylist}
-                  onBlockedAction={() => setShowBlocked(true)}
-                  isDemoSong={!isApproved && DEMO_INDICES.includes(s._idx)}
-                />
-              ))}
+              <div className="sr-list">
+                {searchResults.map(s => (
+                  <div key={s._idx} className="sr-item" onClick={() => {
+                    if (!isApproved && !DEMO_INDICES.includes(s._idx)) { setShowBlocked(true); return }
+                    setOpenSong({ song: s, songIdx: s._idx })
+                  }}>
+                    <div className="sr-title">{s.title}</div>
+                    <div className="sr-sub">{s.artist} · {s.key}</div>
+                  </div>
+                ))}
+              </div>
             </>
           )}
         </div>
       )}
 
-      {/* Demo mode: show only 3 songs */}
+      {/* Demo mode: simple list */}
       {!isApproved && !search && !activePlId && (
-        <div style={{ padding: '0 0 16px' }}>
-          {DEMO_INDICES.map(idx => (
-            <SongCard
-              key={idx}
-              song={songs[idx]}
-              songIdx={idx}
-              fontScale={fontScale}
-              onAddToPlaylist={handleAddToPlaylist}
-              onBlockedAction={() => setShowBlocked(true)}
-              isDemoSong={true}
-            />
+        <div style={{ padding:'0 12px 16px' }}>
+          {DEMO_INDICES.map(idx => songs[idx] && (
+            <div key={idx} className="sr-item" onClick={() => setOpenSong({ song: songs[idx], songIdx: idx })}>
+              <div className="sr-title">{songs[idx].title}</div>
+              <div className="sr-sub">{songs[idx].artist} · Tom: {songs[idx].key}</div>
+            </div>
           ))}
         </div>
       )}
@@ -219,14 +216,13 @@ export default function App() {
           {keySongs.map(s => {
             const idx = songs.indexOf(s)
             return (
-              <SongCard
-                key={idx}
-                song={s}
-                songIdx={idx}
-                fontScale={fontScale}
-                onAddToPlaylist={handleAddToPlaylist}
-                onBlockedAction={() => setShowBlocked(true)}
-              />
+              <div key={idx} className="song-list-item" onClick={() => setOpenSong({ song: s, songIdx: idx })}>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div className="song-title" style={{ fontSize:14 }}>{s.title}</div>
+                  <div className="song-artist">{s.artist}</div>
+                </div>
+                <span style={{ fontSize:11, color:'#CCC', flexShrink:0 }}>›</span>
+              </div>
             )
           })}
         </div>
@@ -269,6 +265,17 @@ export default function App() {
 
       {/* Request modals */}
       {requestType && <RequestModal type={requestType} onClose={() => setRequestType(null)} />}
+
+      {/* Song detail modal */}
+      {openSong && (
+        <SongDetail
+          song={openSong.song}
+          songIdx={openSong.songIdx}
+          onClose={() => setOpenSong(null)}
+          onAddToPlaylist={idx => { setPickerSongIdx(idx); setOpenSong(null) }}
+          onBlockedAction={() => setShowBlocked(true)}
+        />
+      )}
 
       {/* Toast */}
       <div className={`toast${toast ? ' show' : ''}`}>{toast}</div>

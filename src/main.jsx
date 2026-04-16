@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { AuthContext, useAuthProvider } from './hooks/useAuth'
 import App from './App'
 import ChangePasswordPage from './components/ChangePasswordPage'
+import LandingPage from './components/LandingPage'
 import './index.css'
 
 // Wake Lock — keeps screen awake on mobile when app is open
@@ -31,6 +32,12 @@ function Root() {
       </div>
     )
   }
+
+  if (!auth.user) return (
+    <AuthContext.Provider value={auth}>
+      <LandingPage />
+    </AuthContext.Provider>
+  )
 
   return (
     <AuthContext.Provider value={auth}>

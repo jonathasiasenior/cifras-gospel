@@ -59,6 +59,8 @@ body{background:#F5F4F0;color:#1A1A1A;font-family:system-ui,-apple-system,sans-s
 
 /* ── Song body (compact) ── */
 .song-body{padding:10px 10px 14px;column-count:2;column-gap:8px}
+/* Inside detail modal, compact uses full width */
+.detail-modal .song-body{column-count:1}
 .sec{break-inside:avoid;-webkit-column-break-inside:avoid;page-break-inside:avoid;margin-bottom:8px;background:#F8F7F4;border-radius:10px;padding:8px 9px 7px}
 .sec-label{font-size:8px;font-weight:800;color:#CCC;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px}
 .sec-hint{font-size:calc(14px * var(--font-scale));color:#B07020;font-style:italic;font-weight:600;margin-bottom:4px;line-height:1.3;word-break:break-word}
@@ -181,3 +183,34 @@ body{background:#F5F4F0;color:#1A1A1A;font-family:system-ui,-apple-system,sans-s
 .loading{display:flex;align-items:center;justify-content:center;height:60vh;flex-direction:column;gap:12px;color:#999;font-size:14px}
 .spinner{width:32px;height:32px;border:3px solid #F0EEE8;border-top-color:#1a1a2e;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Song list item (main list) ── */
+.song-list-item{display:flex;align-items:center;padding:12px 16px;background:#fff;border-bottom:1px solid #F5F4F0;cursor:pointer;gap:8px;transition:background .1s}
+.song-list-item:active{background:#F8F7F4}
+.song-list-item:first-child{border-radius:0}
+
+/* ── Song Detail Modal ── */
+.detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:700;display:flex;align-items:flex-end}
+.detail-modal{background:#F5F4F0;border-radius:20px 20px 0 0;width:100%;max-width:480px;margin:0 auto;max-height:95vh;overflow-y:auto;display:flex;flex-direction:column}
+.detail-hdr{display:flex;align-items:center;gap:8px;padding:14px 14px 10px;background:#fff;border-bottom:1px solid #F0EEE8;position:sticky;top:0;z-index:10}
+.detail-actions{display:flex;gap:6px;padding:10px 12px;background:#fff;border-bottom:1px solid #F0EEE8;flex-wrap:wrap}
+.act-btn{background:#F0EEE8;border:none;border-radius:10px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;color:#444;white-space:nowrap}
+.act-btn:active{background:#E0DDD6}
+.act-btn-active{background:#FFF3CD;color:#8B6914;box-shadow:0 0 0 1.5px #f0c040}
+.btn-pad{background:#F0EEE8;border:none;border-radius:8px;padding:0 10px;height:30px;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .2s;white-space:nowrap}
+
+/* ── Chords panel ── */
+.chords-panel{background:#fff;border-bottom:1px solid #F0EEE8}
+.chords-panel-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 6px}
+.instr-tabs{display:flex;gap:4px;padding:0 12px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.instr-tab{background:#F0EEE8;border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;color:#666;white-space:nowrap;flex-shrink:0}
+.instr-tab.active{background:#1a1a2e;color:#fff}
+.chord-grid{display:flex;flex-wrap:wrap;gap:4px;padding:4px 12px 14px;overflow-x:auto}
+.chord-item{flex-shrink:0;background:#F8F7F4;border-radius:10px;padding:6px;display:flex;align-items:center;justify-content:center}
+
+/* ── Annotation ── */
+.annot-mark{display:inline-block;background:#FFF3CD;color:#8B6914;font-size:11px;font-style:italic;padding:1px 6px;border-radius:6px;margin-left:4px;border:1px solid #FFE082}
+.trad-lyric{display:block}
+span[data-line]{cursor:inherit}
+.annot-input-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:800;display:flex;align-items:center;justify-content:center;padding:20px}
+.annot-input-box{background:#fff;border-radius:16px;padding:20px;width:100%;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,.2)}
